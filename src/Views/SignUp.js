@@ -1,5 +1,4 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, {Component} from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -12,6 +11,7 @@ import LockIcon from '@material-ui/icons/LockOutlined';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import withStyles from '@material-ui/core/styles/withStyles';
+import axios from 'axios';
 
 const styles = theme => ({
   main: {
@@ -45,44 +45,79 @@ const styles = theme => ({
   },
 });
 
-function SignUp(props) {
+class SignUp extends Component {
+  constructor(props){
+    super(props);
+     this.state = {
+      email: "",
+      password: "",
+      props: props,
+      auth: "",
+      token: "",
+      message: ''
+     };
+     this.handleSubmit = this.handleSubmit.bind(this);
+     this.handleEmail = this.handleEmail.bind(this);
+     this.handlePass = this.handlePass.bind(this);
+  }
 
-  var state = {
-    email: "",
-    password: ""
-  };
-
-  const { classes } = props;
-
-  function handleSubmit(event){
+   async handleSubmit(event){
     event.preventDefault();
+    const data = {
+      email: this.state.email,
+      password: this.state.password
+    };
+    console.log(data);
+    let response = await axios({
+      method: 'post',
+      url: '/register',
+      data: data,
+    });
+    if(!response.data.auth){
+      console.log('x');
+      this.setState({
+        auth: false,
+        message: " (Invalid Credentials)"
+      });
+    }
+    else{
+    this.setState({
+      auth: response.data.auth,
+      token: response.data.token,
+    }, this.props.sendAuth(response.data));
   }
-  function handleEmail(event){
-    console.log(event.target.value);
-    console.log(state.email);
-    state.email += event.target.value;
   }
-  function handlePass(event){
-    state.password = event.target.value;
+   handleEmail(event){
+    this.setState({
+      email: event.target.value,
+    });
   }
+   handlePass(event){
+    this.setState({
+      password: event.target.value,
+    });
+  }
+  render(){
+    const { classes } = this.state.props;
+    var message = this.state.message;
   return (
     <main className={classes.main}>
       <CssBaseline />
       <Paper className={classes.paper}>
-        <Avatar className={classes.avatar}>
+        <Avatar className={styles.avatar}>
           <LockIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
-          Sign Up
+          Sign Up {message}
         </Typography>
-        <form onSubmit={handleSubmit} className={classes.form}>
+        <form onSubmit={this.handleSubmit} className={styles.form}>
           <FormControl margin="normal" required fullWidth>
             <InputLabel htmlFor="email">Email Address</InputLabel>
-            <Input onChange={handleEmail} value={state.email} id="email" name="email" autoComplete="email" autoFocus />
+            <Input onChange={this.handleEmail} value={this.state.email} id="email" name="email" autoComplete="email" autoFocus />
           </FormControl>
           <FormControl margin="normal" required fullWidth>
             <InputLabel htmlFor="password">Password</InputLabel>
-            <Input onChange={handlePass} value={state.password} name="password" type="password" id="password" autoComplete="current-password" />
+            <Input onChange={this.handlePass} value={this.state.password} name="password" type="password" id="password" autoComplete="current-password" />
           </FormControl>
           <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}
@@ -93,7 +128,7 @@ function SignUp(props) {
             fullWidth
             variant="contained"
             color="primary"
-            className={classes.submit}
+            style={styles.submit}
             OnSubmit
           >
             Sign Up
@@ -103,9 +138,7 @@ function SignUp(props) {
     </main>
   );
 }
+}
 
-SignUp.propTypes = {
-  classes: PropTypes.object.isRequired,
-};
 
 export default withStyles(styles)(SignUp);

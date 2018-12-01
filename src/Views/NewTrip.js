@@ -46,7 +46,7 @@ const styles = theme => ({
   },
 });
 
-class SignIn extends Component {
+class NewTrip extends Component {
   constructor(props){
     super(props);
      this.state = {
@@ -83,7 +83,7 @@ class SignIn extends Component {
       this.setState({
         auth: response.data.auth,
         token: response.data.token,
-      }, this.props.sendAuth(response.data));
+    });
     }
   }
    handleEmail(event){
@@ -107,7 +107,7 @@ class SignIn extends Component {
           <LockIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
-          Sign in {message}
+          Request New Trip {message}
         </Typography>
         <form onSubmit={this.handleSubmit} className={classes.form}>
           <FormControl margin="normal" required fullWidth>
@@ -138,8 +138,8 @@ class SignIn extends Component {
 }
 }
 
-SignIn.propTypes = {
+NewTrip.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(SignIn);
+export default withStyles(styles)(NewTrip);
